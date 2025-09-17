@@ -6,637 +6,1293 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>TremorPSD – Análise Clínica de Tremor (Acelerometria)</title>
+  <title>TremorPSD - Análise de Tremor</title>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    :root{
-      --primary:#007AFF;--success:#34C759;--warning:#FF9500;--danger:#FF3B30;--bg:#0b0b0c;--surface:#161618;--surface2:#232327;--text:#fff;--muted:#9d9da3;--border:#2c2c2f
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    :root {
+      --primary: #007AFF;
+      --success: #34C759;
+      --warning: #FF9500;
+      --danger: #FF3B30;
+      --bg: #000000;
+      --surface: #1C1C1E;
+      --surface2: #2C2C2E;
+      --text: #FFFFFF;
+      --text-secondary: #8E8E93;
+      --border: #38383A;
     }
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-    .app-header{position:sticky;top:0;z-index:50;background:rgba(22,22,24,.8);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--border);padding:16px 20px}
-    .app-title{font-weight:800;font-size:22px}
-    .app-subtitle{font-size:13px;color:var(--muted)}
-    .content{padding:16px 16px 110px}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:480px){.row{grid-template-columns:1fr}}
-    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-    .input,.select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px}
-    .select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239d9da3' d='M6 9L1 4h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
-    .btn{display:inline-flex;justify-content:center;align-items:center;width:100%;border:none;border-radius:14px;padding:16px 18px;font-weight:700;font-size:16px;background:var(--primary);color:#fff;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
-    .btn:disabled{opacity:.55;cursor:not-allowed}
-    .btn.secondary{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-weight:600}
-    .status{display:flex;align-items:center;gap:12px}
-    .dot{width:10px;height:10px;border-radius:999px;background:var(--warning)}
-    .dot.ready{background:var(--success)}
-    .dot.error{background:var(--danger)}
-    .micro{font-size:12px;color:var(--muted)}
-    .chart{width:100%;height:220px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden}
-    canvas{width:100%;height:100%}
-    .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
-    .metric{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px}
-    .metric .k{font-size:12px;color:var(--muted)}
-    .metric .v{font-size:20px;font-weight:800;color:var(--primary)}
-    .bars{display:grid;gap:10px}
-    .bar{display:flex;align-items:center;gap:10px}
-    .bar .lbl{width:110px;font-size:14px}
-    .bar .track{flex:1;height:10px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);overflow:hidden}
-    .bar .fill{height:100%;width:0;background:var(--primary);transition:width .5s}
-    .bar .pct{width:54px;text-align:right;font-weight:700}
-    .footer{position:fixed;left:0;right:0;bottom:0;padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));background:rgba(22,22,24,.9);backdrop-filter:blur(8px);border-top:1px solid var(--border);display:flex;gap:10px}
-    .help{font-size:12px;color:var(--muted);line-height:1.5}
-    .hint{background:#0f1a10;border:1px solid #1b3a1d;color:#9fe3a2;padding:10px;border-radius:10px;font-size:12px}
-    .warn{background:#1f1414;border:1px solid #3d1f1f;color:#ffb4b4;padding:10px;border-radius:10px;font-size:12px}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);font-size:12px;color:var(--muted)}
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+    
+    /* Splash Screen / Onboarding */
+    .onboarding {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s, transform 0.5s;
+      padding: 20px;
+    }
+    
+    .onboarding.hidden {
+      opacity: 0;
+      transform: scale(1.1);
+      pointer-events: none;
+    }
+    
+    .onboarding-icon {
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .onboarding-icon svg {
+      width: 70px;
+      height: 70px;
+      fill: white;
+    }
+    
+    .onboarding h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .onboarding p {
+      font-size: 18px;
+      opacity: 0.9;
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 300px;
+      line-height: 1.4;
+    }
+    
+    .onboarding-btn {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 18px 60px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .onboarding-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .onboarding-steps {
+      position: absolute;
+      bottom: 40px;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transition: all 0.3s;
+    }
+    
+    .step-dot.active {
+      background: white;
+      width: 24px;
+      border-radius: 4px;
+    }
+    
+    /* Main App */
+    .app-header {
+      background: var(--surface);
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    
+    .app-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    
+    .app-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .content {
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+    
+    /* Status Card */
+    .status-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .status-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary);
+      transition: background 0.3s;
+    }
+    
+    .status-card.ready::before { background: var(--success); }
+    .status-card.collecting::before { background: var(--warning); }
+    .status-card.error::before { background: var(--danger); }
+    
+    .status-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      position: relative;
+    }
+    
+    .status-icon.pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+    
+    .status-text {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    
+    .status-detail {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    /* Control Panel */
+    .control-panel {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .control-group {
+      margin-bottom: 20px;
+    }
+    
+    .control-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: block;
+    }
+    
+    .control-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 16px;
+      -webkit-appearance: none;
+    }
+    
+    .control-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 16px;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238E8E93' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+    }
+    
+    /* Action Button */
+    .action-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .action-btn.collecting {
+      background: var(--warning);
+    }
+    
+    .action-btn.success {
+      background: var(--success);
+    }
+    
+    .action-btn-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+      transition: width linear;
+    }
+    
+    /* Results Section */
+    .results {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .results-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .chart-container {
+      width: 100%;
+      height: 200px;
+      background: var(--surface2);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      position: relative;
+    }
+    
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+    }
+    
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+    
+    .metric-card {
+      background: var(--surface2);
+      padding: 12px;
+      border-radius: 12px;
+    }
+    
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    /* Classification */
+    .classification {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .classification-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .classification-label {
+      flex: 0 0 100px;
+      font-size: 14px;
+    }
+    
+    .classification-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--surface2);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0 10px;
+    }
+    
+    .classification-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.5s ease;
+      border-radius: 4px;
+    }
+    
+    .classification-percent {
+      flex: 0 0 50px;
+      text-align: right;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    /* Footer Actions */
+    .footer-actions {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 15px 20px;
+      padding-bottom: calc(15px + env(safe-area-inset-bottom));
+      display: flex;
+      gap: 10px;
+    }
+    
+    .footer-btn {
+      flex: 1;
+      padding: 12px;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    
+    /* Loading Spinner */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--surface2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 375px) {
+      .app-title { font-size: 20px; }
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+    
+    /* Hidden class */
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <header class="app-header">
+  <!-- Onboarding Screen -->
+  <div class="onboarding" id="onboarding">
+    <div class="onboarding-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M13.5,5.5C14.59,5.5 15.5,4.58 15.5,3.5C15.5,2.38 14.59,1.5 13.5,1.5C12.39,1.5 11.5,2.38 11.5,3.5C11.5,4.58 12.39,5.5 13.5,5.5M9.89,19.38L10.89,15L13,17V23H15V15.5L12.89,13.5L13.5,10.5C14.79,12 16.79,13 19,13V11C17.09,11 15.5,10 14.69,8.58L13.69,7C13.29,6.38 12.69,6 12,6C11.69,6 11.5,6.08 11.19,6.08L6,8.28V13H8V9.58L9.79,8.88L8.19,17L3.29,16L2.89,18L9.89,19.38Z"/>
+      </svg>
+    </div>
+    <h1>TremorPSD</h1>
+    <p>Análise profissional de tremor usando o acelerômetro do seu dispositivo</p>
+    <button class="onboarding-btn" onclick="startOnboarding()">Começar Análise</button>
+    <div class="onboarding-steps">
+      <span class="step-dot active"></span>
+      <span class="step-dot"></span>
+      <span class="step-dot"></span>
+    </div>
+  </div>
+  
+  <!-- Main App -->
+  <div class="app-header">
     <div class="app-title">TremorPSD</div>
-    <div class="app-subtitle">Análise clínica por acelerometria • protocolo guiado</div>
-  </header>
-
-  <main class="content">
-    <!-- Sensores / Permissão -->
-    <section class="card" id="cardPerm">
-      <div class="status"><span class="dot" id="statusDot"></span>
-        <div>
-          <div id="statusTitle" style="font-weight:700">Sensores não ativados</div>
-          <div class="micro" id="statusDesc">Para iPhone/iPad, é obrigatório permitir o Acesso a Movimento e Orientação em um toque do usuário e via HTTPS.</div>
+    <div class="app-subtitle">Análise de Tremor por Acelerometria</div>
+  </div>
+  
+  <div class="content">
+    <!-- Status Card -->
+    <div class="status-card" id="statusCard">
+      <div class="status-icon" id="statusIcon">
+        <div class="spinner" id="spinner"></div>
+        <svg id="iconReady" class="hidden" width="30" height="30" viewBox="0 0 24 24" fill="var(--success)">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+        </svg>
+      </div>
+      <div class="status-text" id="statusText">Preparando sensores...</div>
+      <div class="status-detail" id="statusDetail">Aguarde um momento</div>
+    </div>
+    
+    <!-- Control Panel -->
+    <div class="control-panel">
+      <div class="control-group">
+        <label class="control-label">Duração da coleta (segundos)</label>
+        <input type="number" class="control-input" id="duration" value="20" min="10" max="60">
+      </div>
+      
+      <div class="control-group">
+        <label class="control-label">Componente do sinal</label>
+        <select class="control-select" id="axis">
+          <option value="mag">Magnitude total (√x²+y²+z²)</option>
+          <option value="x">Apenas eixo X</option>
+          <option value="y">Apenas eixo Y</option>
+          <option value="z">Apenas eixo Z</option>
+        </select>
+      </div>
+      
+      <button class="action-btn" id="actionBtn" onclick="handleAction()" disabled>
+        <span id="actionText">Preparando...</span>
+        <div class="action-btn-progress" id="progressBar"></div>
+      </button>
+    </div>
+    
+    <!-- Results Section (Initially Hidden) -->
+    <div class="results hidden" id="resultsSection">
+      <div class="results-title">Análise Espectral</div>
+      
+      <div class="chart-container">
+        <canvas id="chartTime"></canvas>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="chartPSD"></canvas>
+      </div>
+      
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Frequência do pico</div>
+          <div class="metric-value" id="metricFreq">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Proeminência</div>
+          <div class="metric-value" id="metricProm">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Largura (Hz)</div>
+          <div class="metric-value" id="metricWidth">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Taxa (Hz)</div>
+          <div class="metric-value" id="metricRate">—</div>
         </div>
       </div>
-      <div style="height:8px"></div>
-      <button class="btn" id="btnEnable">Ativar sensores</button>
-      <div style="height:10px"></div>
-      <div class="help">Requisitos: <span class="pill">HTTPS</span> <span class="pill">iOS 13+</span> <span class="pill">Android 10+</span> <span class="pill">Taxa ≥ 50 Hz</span></div>
-    </section>
-
-    <!-- Protocolo Clínico -->
-    <section class="card">
-      <div style="font-weight:800;margin-bottom:10px">Protocolo</div>
-      <div class="row">
-        <div>
-          <label>Postura/Tarefa</label>
-          <select class="select" id="selPosture">
-            <option value="rest">Repouso (mãos apoiadas)</option>
-            <option value="posture">Postural (braços estendidos)</option>
-            <option value="action">Cinético (dedo–nariz–dedo)</option>
-            <option value="standing">Ortostatismo (em pé) – pesquisa de OT</option>
-          </select>
+    </div>
+    
+    <!-- Classification (Initially Hidden) -->
+    <div class="classification hidden" id="classificationSection">
+      <div class="results-title">Classificação Sugerida</div>
+      
+      <div class="classification-item">
+        <span class="classification-label">Ortostático</span>
+        <div class="classification-bar">
+          <div class="classification-fill" id="barOT" style="width: 0%"></div>
         </div>
-        <div>
-          <label>Segmento/Posicionamento</label>
-          <select class="select" id="selPlacement">
-            <option>Mão (dorso) – braçadeira</option>
-            <option>Dedo indicador – fita</option>
-            <option>Antebraço distal</option>
-            <option>Perna (tíbia) – OT</option>
-          </select>
+        <span class="classification-percent" id="pctOT">0%</span>
+      </div>
+      
+      <div class="classification-item">
+        <span class="classification-label">Essencial</span>
+        <div class="classification-bar">
+          <div class="classification-fill" id="barET" style="width: 0%"></div>
         </div>
+        <span class="classification-percent" id="pctET">0%</span>
       </div>
-      <div class="row" style="margin-top:10px">
-        <div>
-          <label>Duração (s)</label>
-          <input class="input" id="inpDur" type="number" min="15" max="90" value="30"/>
+      
+      <div class="classification-item">
+        <span class="classification-label">Distônico</span>
+        <div class="classification-bar">
+          <div class="classification-fill" id="barDT" style="width: 0%"></div>
         </div>
-        <div>
-          <label>Componente do sinal</label>
-          <select class="select" id="selAxis">
-            <option value="mag">Magnitude total (√x²+y²+z²)</option>
-            <option value="x">Eixo X</option>
-            <option value="y">Eixo Y</option>
-            <option value="z">Eixo Z</option>
-          </select>
+        <span class="classification-percent" id="pctDT">0%</span>
+      </div>
+      
+      <div class="classification-item">
+        <span class="classification-label">Mioclonia</span>
+        <div class="classification-bar">
+          <div class="classification-fill" id="barMY" style="width: 0%"></div>
         </div>
+        <span class="classification-percent" id="pctMY">0%</span>
       </div>
-      <div class="row" style="margin-top:10px">
-        <div>
-          <label>Janela Welch (s)</label>
-          <input class="input" id="inpWelch" type="number" min="2" max="8" value="4"/>
-        </div>
-        <div>
-          <label>Sobreposição (%)</label>
-          <input class="input" id="inpOverlap" type="number" min="0" max="90" value="50"/>
-        </div>
-      </div>
-      <div class="hint" style="margin-top:10px" id="hintTask">Orientação: mantenha o segmento relaxado e imóvel; evite apoiar o smartphone sobre superfícies rígidas.</div>
-      <div style="height:10px"></div>
-      <button class="btn" id="btnStart" disabled>Iniciar coleta</button>
-    </section>
-
-    <!-- Qualidade do Sinal -->
-    <section class="card" id="cardQual" style="display:none">
-      <div style="font-weight:800;margin-bottom:10px">Qualidade do sinal</div>
-      <div class="row">
-        <div class="metric"><div class="k">Taxa de amostragem</div><div class="v" id="vFs">—</div></div>
-        <div class="metric"><div class="k">Amostras coletadas</div><div class="v" id="vNSamp">—</div></div>
-        <div class="metric"><div class="k">Saturação</div><div class="v" id="vSat">—</div></div>
-        <div class="metric"><div class="k">SNR estimada</div><div class="v" id="vSNR">—</div></div>
-      </div>
-      <div class="warn" style="margin-top:10px;display:none" id="warnFs">Taxa insuficiente (&lt; 50 Hz). Considere outro dispositivo ou navegador.</div>
-    </section>
-
-    <!-- Gráficos -->
-    <section class="card" id="cardPlots" style="display:none">
-      <div style="font-weight:800;margin-bottom:10px">Sinais</div>
-      <div class="chart"><canvas id="cTime"></canvas></div>
-      <div style="height:10px"></div>
-      <div class="chart"><canvas id="cPSD"></canvas></div>
-      <div class="metrics">
-        <div class="metric"><div class="k">Frequência de pico</div><div class="v" id="mPeak">—</div></div>
-        <div class="metric"><div class="k">FWHM (Hz)</div><div class="v" id="mFwhm">—</div></div>
-        <div class="metric"><div class="k">Razão pico/total</div><div class="v" id="mPtr">—</div></div>
-        <div class="metric"><div class="k">Entropia espectral</div><div class="v" id="mSE">—</div></div>
-        <div class="metric"><div class="k">Índice estabilidade</div><div class="v" id="mTSI">—</div></div>
-        <div class="metric"><div class="k">Centróide espectral</div><div class="v" id="mSC">—</div></div>
-      </div>
-    </section>
-
-    <!-- Classificação -->
-    <section class="card" id="cardClass" style="display:none">
-      <div style="font-weight:800;margin-bottom:10px">Classificação sugerida (heurística explicável)</div>
-      <div class="bars">
-        <div class="bar"><div class="lbl">Ortostático</div><div class="track"><div class="fill" id="barOT"></div></div><div class="pct" id="pctOT">0%</div></div>
-        <div class="bar"><div class="lbl">Essencial</div><div class="track"><div class="fill" id="barET"></div></div><div class="pct" id="pctET">0%</div></div>
-        <div class="bar"><div class="lbl">Parkinsoniano</div><div class="track"><div class="fill" id="barPD"></div></div><div class="pct" id="pctPD">0%</div></div>
-        <div class="bar"><div class="lbl">Distônico</div><div class="track"><div class="fill" id="barDT"></div></div><div class="pct" id="pctDT">0%</div></div>
-        <div class="bar"><div class="lbl">Mioclonia</div><div class="track"><div class="fill" id="barMY"></div></div><div class="pct" id="pctMY">0%</div></div>
-      </div>
-      <div class="help" style="margin-top:10px" id="explain"></div>
-    </section>
-
-    <!-- Consentimento e Privacidade -->
-    <section class="card">
-      <div style="font-weight:800;margin-bottom:8px">Privacidade & Exportação</div>
-      <div class="help">Os dados ficam apenas no seu dispositivo. Exportação opcional em CSV/JSON para prontuário/pesquisa.</div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <div class="footer">
-    <button class="btn secondary" id="btnExportCsv" disabled>Exportar CSV</button>
-    <button class="btn secondary" id="btnExportJson" disabled>Exportar JSON</button>
-    <button class="btn" id="btnReset" disabled>Nova análise</button>
+    </div>
+  </div>
+  
+  <!-- Footer Actions -->
+  <div class="footer-actions hidden" id="footerActions">
+    <button class="footer-btn" onclick="exportData()">Exportar CSV</button>
+    <button class="footer-btn" onclick="resetApp()">Nova Análise</button>
   </div>
 
 <script>
-/**********************\
- *  ESTADO GLOBAL     *
-\**********************/
-const S = {
-  enabled:false, collecting:false,
-  useAccelInclGrav:false, // fallback iOS
-  data:[], times:[], startMS:0,
-  fsEst:0, eventCount:0, axis:'mag',
-  posture:'rest', duration:30, welchWin:4, overlap:0.5,
-  results:null
+// Global state
+let state = {
+  onboarded: false,
+  sensorReady: false,
+  collecting: false,
+  data: [],
+  results: null,
+  mode: 'mag',
+  startTime: null,
+  sampleRate: 0,
+  eventCount: 0
 };
 
-function isSecure(){
-  return location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname)||location.hostname.endsWith('.local');
+// Check for HTTPS or secure context
+function isSecureContext() {
+  return location.protocol === 'https:' || 
+         location.hostname === 'localhost' || 
+         location.hostname === '127.0.0.1' ||
+         location.hostname.includes('.local');
 }
 
-/**********************\
- *  PERMISSÃO iOS      *
-\**********************/
-async function enableSensors(){
-  const dot = document.getElementById('statusDot');
-  const title = document.getElementById('statusTitle');
-  const desc = document.getElementById('statusDesc');
-
-  if(!isSecure()){
-    dot.className='dot error';
-    title.textContent='Necessário HTTPS';
-    desc.textContent='Abra via HTTPS (ex.: GitHub Pages/Netlify) ou localhost para liberar sensores.';
+// Onboarding flow
+async function startOnboarding() {
+  const onboardingEl = document.getElementById('onboarding');
+  
+  // Check secure context first
+  if (!isSecureContext()) {
+    onboardingEl.querySelector('p').textContent = 'Por favor, acesse via HTTPS para usar os sensores';
+    onboardingEl.querySelector('.onboarding-btn').textContent = 'Entendido';
+    onboardingEl.querySelector('.onboarding-btn').onclick = () => {
+      alert('Hospede este arquivo em HTTPS (GitHub Pages, Netlify, etc) para funcionar corretamente.');
+    };
     return;
   }
+  
+  // Auto-request permission
+  await requestSensorPermission();
+  
+  // Hide onboarding
+  setTimeout(() => {
+    onboardingEl.classList.add('hidden');
+    state.onboarded = true;
+    initializeApp();
+  }, 500);
+}
 
-  try{
-    // iOS 13+: requer gesto do usuário
-    if(typeof DeviceMotionEvent!=='undefined' && typeof DeviceMotionEvent.requestPermission==='function'){
-      const resp = await DeviceMotionEvent.requestPermission();
-      if(resp!=='granted') throw new Error('Permissão negada pelo usuário');
+// Request sensor permission with multiple fallback strategies
+async function requestSensorPermission() {
+  try {
+    // Strategy 1: iOS 13+ DeviceMotionEvent
+    if (typeof DeviceMotionEvent !== 'undefined' && 
+        typeof DeviceMotionEvent.requestPermission === 'function') {
+      const response = await DeviceMotionEvent.requestPermission();
+      if (response === 'granted') {
+        state.sensorReady = true;
+        return true;
+      }
     }
-    // Testar disponibilidade e iniciar listener
-    setupMotionListener();
-    S.enabled=true;
-    dot.className='dot ready';
-    title.textContent='Sensores prontos';
-    desc.textContent='Movimente levemente o aparelho para estimar a taxa.';
-    document.getElementById('btnStart').disabled=false;
-    document.getElementById('btnReset').disabled=false;
-  }catch(e){
-    console.error(e);
-    dot.className='dot error';
-    title.textContent='Permissão necessária';
-    desc.textContent='Toque novamente em “Ativar sensores” e conceda acesso a Movimento.';
+    
+    // Strategy 2: Android/Desktop - sensors usually work directly
+    if (window.DeviceMotionEvent) {
+      state.sensorReady = true;
+      return true;
+    }
+    
+    // Strategy 3: Generic Accelerometer API (newer devices)
+    if ('Accelerometer' in window) {
+      try {
+        const sensor = new Accelerometer({ frequency: 60 });
+        await sensor.start();
+        sensor.stop();
+        state.sensorReady = true;
+        return true;
+      } catch(e) {
+        console.log('Accelerometer API not available');
+      }
+    }
+    
+  } catch(error) {
+    console.error('Sensor permission error:', error);
+  }
+  
+  return false;
+}
+
+// Initialize main app
+function initializeApp() {
+  const statusCard = document.getElementById('statusCard');
+  const statusText = document.getElementById('statusText');
+  const statusDetail = document.getElementById('statusDetail');
+  const actionBtn = document.getElementById('actionBtn');
+  const actionText = document.getElementById('actionText');
+  const spinner = document.getElementById('spinner');
+  const iconReady = document.getElementById('iconReady');
+  
+  // Setup event listeners
+  setupMotionListener();
+  
+  // Check sensor availability
+  setTimeout(() => {
+    if (state.eventCount > 0) {
+      statusCard.classList.add('ready');
+      spinner.classList.add('hidden');
+      iconReady.classList.remove('hidden');
+      statusText.textContent = 'Pronto para análise';
+      statusDetail.textContent = `Taxa: ${state.sampleRate.toFixed(0)} Hz`;
+      actionBtn.disabled = false;
+      actionText.textContent = 'Iniciar Coleta';
+      document.getElementById('statusIcon').classList.add('pulse');
+    } else {
+      // Auto-retry with visual feedback
+      statusText.textContent = 'Ativando sensores...';
+      statusDetail.textContent = 'Mova o dispositivo levemente';
+      retrySetup();
+    }
+  }, 1500);
+}
+
+// Setup motion event listener
+function setupMotionListener() {
+  let lastTime = null;
+  
+  const handleMotion = (event) => {
+    state.eventCount++;
+    
+    // Calculate sample rate
+    const now = Date.now();
+    if (lastTime) {
+      const dt = (now - lastTime) / 1000;
+      state.sampleRate = state.sampleRate * 0.9 + (1/dt) * 0.1;
+    }
+    lastTime = now;
+    
+    // Collect data if in collection mode
+    if (state.collecting) {
+      const acc = event.acceleration || event.accelerationIncludingGravity;
+      if (acc) {
+        const ax = acc.x || 0;
+        const ay = acc.y || 0;
+        const az = acc.z || 0;
+        
+        let value = 0;
+        switch(state.mode) {
+          case 'mag':
+            value = Math.sqrt(ax*ax + ay*ay + az*az);
+            break;
+          case 'x': value = ax; break;
+          case 'y': value = ay; break;
+          case 'z': value = az; break;
+        }
+        
+        const timestamp = (now - state.startTime) / 1000;
+        state.data.push([timestamp, value]);
+        
+        // Update progress
+        updateProgress();
+      }
+    }
+  };
+  
+  // Remove old listeners
+  window.removeEventListener('devicemotion', handleMotion);
+  
+  // Add new listener
+  window.addEventListener('devicemotion', handleMotion, true);
+}
+
+// Retry setup with haptic feedback
+function retrySetup() {
+  // Vibrate if available (haptic feedback)
+  if ('vibrate' in navigator) {
+    navigator.vibrate(100);
+  }
+  
+  // Create a subtle animation to prompt user interaction
+  const statusIcon = document.getElementById('statusIcon');
+  statusIcon.style.animation = 'pulse 1s infinite';
+  
+  // Check again after user movement
+  setTimeout(() => {
+    if (state.eventCount > 0) {
+      initializeApp();
+    } else {
+      document.getElementById('statusText').textContent = 'Toque para ativar';
+      document.getElementById('statusDetail').textContent = 'Precisamos de sua permissão';
+      document.getElementById('actionBtn').disabled = false;
+      document.getElementById('actionText').textContent = 'Ativar Sensores';
+      document.getElementById('actionBtn').onclick = async () => {
+        await requestSensorPermission();
+        setupMotionListener();
+        setTimeout(() => initializeApp(), 1000);
+      };
+    }
+  }, 2000);
+}
+
+// Handle main action button
+function handleAction() {
+  if (!state.collecting) {
+    startCollection();
+  } else {
+    stopCollection();
   }
 }
 
-/**********************\
- *  LISTENER & FS      *
-\**********************/
-let lastTS=null;
-function setupMotionListener(){
-  window.addEventListener('devicemotion', onMotion, {passive:true});
+// Start data collection
+function startCollection() {
+  // Reset state
+  state.data = [];
+  state.collecting = true;
+  state.startTime = Date.now();
+  state.mode = document.getElementById('axis').value;
+  
+  // Update UI
+  const statusCard = document.getElementById('statusCard');
+  const actionBtn = document.getElementById('actionBtn');
+  statusCard.classList.remove('ready');
+  statusCard.classList.add('collecting');
+  actionBtn.classList.add('collecting');
+  
+  document.getElementById('statusText').textContent = 'Coletando dados...';
+  document.getElementById('statusDetail').textContent = 'Mantenha o dispositivo estável';
+  document.getElementById('actionText').textContent = 'Parar Coleta';
+  
+  // Auto-stop after duration
+  const duration = parseInt(document.getElementById('duration').value) || 20;
+  setTimeout(() => {
+    if (state.collecting) stopCollection();
+  }, duration * 1000);
 }
 
-function onMotion(ev){
-  S.eventCount++;
-  const now = performance.now();
-  if(lastTS!=null){
-    const dt = (now-lastTS)/1000;
-    const inst = 1/dt;
-    // filtro exponencial para fs estimada
-    S.fsEst = S.fsEst? (0.9*S.fsEst + 0.1*inst) : inst;
+// Update progress bar
+function updateProgress() {
+  if (!state.collecting) return;
+  
+  const duration = parseInt(document.getElementById('duration').value) || 20;
+  const elapsed = (Date.now() - state.startTime) / 1000;
+  const progress = Math.min(100, (elapsed / duration) * 100);
+  
+  document.getElementById('progressBar').style.width = `${progress}%`;
+  document.getElementById('progressBar').style.transitionDuration = '0.1s';
+  
+  // Update detail text
+  const remaining = Math.max(0, duration - elapsed);
+  document.getElementById('statusDetail').textContent = `${remaining.toFixed(0)}s restantes | ${state.data.length} amostras`;
+}
+
+// Stop collection and analyze
+function stopCollection() {
+  state.collecting = false;
+  
+  // Update UI
+  const statusCard = document.getElementById('statusCard');
+  const actionBtn = document.getElementById('actionBtn');
+  statusCard.classList.remove('collecting');
+  actionBtn.classList.remove('collecting');
+  actionBtn.classList.add('success');
+  
+  document.getElementById('statusText').textContent = 'Analisando...';
+  document.getElementById('statusDetail').textContent = 'Processando dados';
+  document.getElementById('actionText').textContent = 'Análise Completa';
+  document.getElementById('progressBar').style.width = '0%';
+  
+  // Vibrate for completion
+  if ('vibrate' in navigator) {
+    navigator.vibrate([100, 50, 100]);
   }
-  lastTS = now;
+  
+  // Analyze data
+  setTimeout(() => {
+    analyzeData();
+  }, 500);
+}
 
-  if(!S.collecting) return;
-
-  // Preferir acceleration (sem gravidade). Se vier null (iOS), usar includingGravity e filtrar alta-passante.
-  const a = ev.acceleration || ev.accelerationIncludingGravity || {x:0,y:0,z:0};
-  const ax = a.x||0, ay=a.y||0, az=a.z||0;
-  // High-pass simples para remover gravidade quando incluindo gravidade
-  let x=ax, y=ay, z=az;
-  if(ev.acceleration==null){
-    // filtro RC alta-passante (~0.5 Hz)
-    highPass(ax,ay,az);
-    x = HP.x; y = HP.y; z = HP.z;
+// Simplified FFT implementation
+function computeFFT(signal) {
+  const n = signal.length;
+  const nextPow2 = Math.pow(2, Math.ceil(Math.log2(n)));
+  const padded = new Float64Array(nextPow2);
+  padded.set(signal);
+  
+  // Simple DFT for demonstration (replace with proper FFT in production)
+  const real = new Float64Array(nextPow2);
+  const imag = new Float64Array(nextPow2);
+  
+  for (let k = 0; k < nextPow2/2; k++) {
+    for (let n = 0; n < nextPow2; n++) {
+      const angle = -2 * Math.PI * k * n / nextPow2;
+      real[k] += padded[n] * Math.cos(angle);
+      imag[k] += padded[n] * Math.sin(angle);
+    }
   }
-
-  let val=0;
-  switch(S.axis){
-    case 'x': val=x; break; case 'y': val=y; break; case 'z': val=z; break; default: val=Math.hypot(x,y,z);
+  
+  // Compute power spectrum
+  const power = new Float64Array(nextPow2/2);
+  for (let i = 0; i < nextPow2/2; i++) {
+    power[i] = Math.sqrt(real[i]*real[i] + imag[i]*imag[i]);
   }
-  const t = (now - S.startMS)/1000;
-  S.times.push(t); S.data.push(val);
-
-  // Atualizar qualidade a cada ~0.5s
-  if(S.times.length%20===0) updateQuality();
+  
+  return power;
 }
 
-// Filtro RC alta-passante estado
-const HP = { prevIn:{x:0,y:0,z:0}, prevOut:{x:0,y:0,z:0}, x:0,y:0,z:0 };
-function highPass(x,y,z){
-  const dt = 1/Math.max(1,S.fsEst||60);
-  const fc = 0.5; // Hz
-  const RC = 1/(2*Math.PI*fc);
-  const a = RC/(RC+dt);
-  HP.x = a*(HP.prevOut.x + x - HP.prevIn.x);
-  HP.y = a*(HP.prevOut.y + y - HP.prevIn.y);
-  HP.z = a*(HP.prevOut.z + z - HP.prevIn.z);
-  HP.prevIn={x,y,z};
-  HP.prevOut={x:HP.x,y:HP.y,z:HP.z};
-}
-
-/**********************\
- *  COLETA             *
-\**********************/
-function startCollection(){
-  S.axis = document.getElementById('selAxis').value;
-  S.posture = document.getElementById('selPosture').value;
-  S.duration = clamp(parseInt(document.getElementById('inpDur').value)||30, 15, 120);
-  S.welchWin = clamp(parseFloat(document.getElementById('inpWelch').value)||4, 2, 8);
-  S.overlap = clamp((parseInt(document.getElementById('inpOverlap').value)||50)/100, 0, 0.9);
-
-  // Reset buffers
-  S.data = []; S.times=[]; S.results=null;
-  S.collecting=true; S.startMS=performance.now();
-  HP.prevIn={x:0,y:0,z:0}; HP.prevOut={x:0,y:0,z:0};
-
-  document.getElementById('cardQual').style.display='block';
-  document.getElementById('cardPlots').style.display='none';
-  document.getElementById('cardClass').style.display='none';
-  updateTaskHint();
-
-  // Parar automático
-  setTimeout(()=>{ if(S.collecting) stopCollection(); }, S.duration*1000);
-  document.getElementById('btnStart').textContent='Parar coleta';
-}
-
-function stopCollection(){
-  S.collecting=false;
-  document.getElementById('btnStart').textContent='Iniciar coleta';
-  analyze();
-}
-
-/**********************\
- *  QUALIDADE          *
-\**********************/
-function updateQuality(){
-  const fs = S.fsEst||0; const n=S.data.length;
-  const vFs = document.getElementById('vFs');
-  const vNS = document.getElementById('vNSamp');
-  vFs.textContent = fs.toFixed(0)+' Hz';
-  vNS.textContent = n.toString();
-  // Saturação (valores muito altos) – heurística
-  const maxAbs = S.data.length? Math.max(...S.data.map(Math.abs)) : 0;
-  document.getElementById('vSat').textContent = (maxAbs>15?'sim':'não');
-  // SNR estimada: pico/ruído (placeholder até análise)
-  document.getElementById('vSNR').textContent = n>256? '~em análise' : '—';
-  // Aviso de taxa
-  document.getElementById('warnFs').style.display = fs<50? 'block':'none';
-}
-
-/**********************\
- *  FFT & PSD (Welch)  *
-\**********************/
-function hann(N){ const w=new Float64Array(N); for(let n=0;n<N;n++) w[n]=0.5-0.5*Math.cos(2*Math.PI*n/(N-1)); return w; }
-function nextPow2(n){ return 1<<Math.ceil(Math.log2(n)); }
-
-// FFT radix-2 iterativa (Cooley–Tukey) – suficiente p/ tamanhos até 8192
-function fftRadix2(re, im){
-  const n = re.length; const levels = Math.log2(n)|0;
-  // bit-reverse
-  for(let i=0,j=0;i<n;i++){
-    if(j>i){ [re[i],re[j]]=[re[j],re[i]]; [im[i],im[j]]=[im[j],im[i]]; }
-    let m=n>>1; while(m>=1 && j>=m){ j-=m; m>>=1;} j+=m;
+// Analyze collected data
+function analyzeData() {
+  if (state.data.length < 50) {
+    document.getElementById('statusText').textContent = 'Dados insuficientes';
+    document.getElementById('statusDetail').textContent = 'Tente novamente com mais tempo';
+    return;
   }
-  for(let size=2; size<=n; size<<=1){
-    const half=size>>1; const step = -2*Math.PI/size;
-    for(let i=0;i<n;i+=size){
-      for(let k=0;k<half;k++){
-        const angle = step*k; const wr=Math.cos(angle), wi=Math.sin(angle);
-        const j=i+k, l=j+half;
-        const tr = wr*re[l]-wi*im[l];
-        const ti = wr*im[l]+wi*re[l];
-        re[l]=re[j]-tr; im[l]=im[j]-ti;
-        re[j]+=tr; im[j]+=ti;
+  
+  // Extract time and signal arrays
+  const times = state.data.map(d => d[0]);
+  const signal = state.data.map(d => d[1]);
+  
+  // Remove DC component (detrend)
+  const mean = signal.reduce((a, b) => a + b, 0) / signal.length;
+  const detrended = signal.map(v => v - mean);
+  
+  // Compute sample rate
+  const dt = times[times.length-1] / (times.length-1);
+  const fs = 1 / dt;
+  
+  // Compute FFT
+  const spectrum = computeFFT(detrended);
+  
+  // Create frequency array
+  const freqs = new Float64Array(spectrum.length);
+  for (let i = 0; i < spectrum.length; i++) {
+    freqs[i] = i * fs / (spectrum.length * 2);
+  }
+  
+  // Find peak frequency
+  let peakIdx = 0;
+  let peakValue = 0;
+  for (let i = 1; i < spectrum.length; i++) {
+    if (freqs[i] > 1 && freqs[i] < 30) { // Search between 1-30 Hz
+      if (spectrum[i] > peakValue) {
+        peakValue = spectrum[i];
+        peakIdx = i;
       }
     }
   }
+  
+  const peakFreq = freqs[peakIdx];
+  
+  // Calculate metrics
+  const prominence = peakValue / (spectrum.reduce((a,b) => a+b, 0) / spectrum.length);
+  
+  // Calculate FWHM (Full Width at Half Maximum)
+  const halfMax = peakValue / 2;
+  let leftIdx = peakIdx;
+  let rightIdx = peakIdx;
+  while (leftIdx > 0 && spectrum[leftIdx] > halfMax) leftIdx--;
+  while (rightIdx < spectrum.length-1 && spectrum[rightIdx] > halfMax) rightIdx++;
+  const width = freqs[rightIdx] - freqs[leftIdx];
+  
+  // Store results
+  state.results = {
+    times: times,
+    signal: detrended,
+    freqs: freqs,
+    spectrum: spectrum,
+    peakFreq: peakFreq,
+    prominence: prominence,
+    width: width,
+    sampleRate: fs
+  };
+  
+  // Display results
+  displayResults();
+  
+  // Classify tremor type
+  classifyTremor();
+  
+  // Update UI
+  document.getElementById('statusCard').classList.add('ready');
+  document.getElementById('statusText').textContent = 'Análise completa';
+  document.getElementById('statusDetail').textContent = `Frequência dominante: ${peakFreq.toFixed(1)} Hz`;
+  document.getElementById('actionBtn').disabled = true;
+  document.getElementById('footerActions').classList.remove('hidden');
 }
 
-function welchPSD(x, fs, winSec=4, overlap=0.5){
-  const Nwin = Math.max(64, nextPow2(Math.round(winSec*fs)));
-  const step = Math.max(1, Math.round(Nwin*(1-overlap)));
-  const w = hann(Nwin); const U = w.reduce((a,b)=>a+b*b,0)/Nwin; // correção de ganho
-  const nSeg = Math.max(1, Math.floor((x.length - Nwin)/step)+1);
-  const half = (Nwin>>1);
-  const psd = new Float64Array(half);
-
-  for(let s=0, off=0; s<nSeg; s++, off+=step){
-    const seg = x.slice(off, off+Nwin);
-    if(seg.length<Nwin) break;
-    const re=new Float64Array(Nwin), im=new Float64Array(Nwin);
-    for(let n=0;n<Nwin;n++){ re[n]=seg[n]*w[n]; }
-    fftRadix2(re,im);
-    for(let k=0;k<half;k++){
-      const p = (re[k]*re[k]+im[k]*im[k])/(Nwin*fs*U);
-      psd[k]+=p;
-    }
-  }
-  for(let k=0;k<psd.length;k++) psd[k]/=nSeg;
-  const freqs = new Float64Array(psd.length);
-  for(let k=0;k<psd.length;k++) freqs[k]=k*fs/Nwin;
-  return {freqs, psd};
+// Display analysis results
+function displayResults() {
+  const { times, signal, freqs, spectrum, peakFreq, prominence, width, sampleRate } = state.results;
+  
+  // Show results section
+  document.getElementById('resultsSection').classList.remove('hidden');
+  
+  // Update metrics
+  document.getElementById('metricFreq').textContent = `${peakFreq.toFixed(1)} Hz`;
+  document.getElementById('metricProm').textContent = prominence.toFixed(1);
+  document.getElementById('metricWidth').textContent = `${width.toFixed(2)} Hz`;
+  document.getElementById('metricRate').textContent = `${sampleRate.toFixed(0)} Hz`;
+  
+  // Plot time series
+  plotTimeSeries(times, signal);
+  
+  // Plot spectrum
+  plotSpectrum(freqs, spectrum, peakFreq);
 }
 
-/**********************\
- *  ANÁLISE            *
-\**********************/
-function analyze(){
-  if(S.data.length<Math.max(200, S.duration* (S.fsEst||30)/2)){
-    alert('Dados insuficientes. Aumente a duração ou verifique a taxa de amostragem.');
-    return;
+// Plot time series
+function plotTimeSeries(times, signal) {
+  const canvas = document.getElementById('chartTime');
+  const ctx = canvas.getContext('2d');
+  
+  // Set canvas size for retina displays
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * window.devicePixelRatio;
+  canvas.height = rect.height * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  
+  // Clear canvas
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  
+  // Calculate bounds
+  const padding = 20;
+  const width = rect.width - 2 * padding;
+  const height = rect.height - 2 * padding;
+  
+  const minT = Math.min(...times);
+  const maxT = Math.max(...times);
+  const minS = Math.min(...signal);
+  const maxS = Math.max(...signal);
+  const rangeS = maxS - minS || 1;
+  
+  // Draw grid
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + i * height / 5;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(rect.width - padding, y);
+    ctx.stroke();
   }
-  const fs = S.fsEst||60;
-  // detrend (remover média)
-  const mean = S.data.reduce((a,b)=>a+b,0)/S.data.length;
-  const x = S.data.map(v=>v-mean);
-  // band-pass 3–20 Hz (IIR biquad em cascata simples)
-  const xbp = biquadBandpass(x, fs, 3, 20);
-  // Welch PSD 0–30 Hz
-  const {freqs, psd} = welchPSD(xbp, fs, S.welchWin, S.overlap);
-  const maxF = 30; let lastIdx = 0; for(let i=0;i<freqs.length;i++){ if(freqs[i]<=maxF) lastIdx=i; else break; }
-  const F = freqs.slice(0,lastIdx+1); const P = psd.slice(0,lastIdx+1);
-
-  // métricas
-  // pico principal 3–20 Hz
-  let pIdx=0, pVal=0; for(let i=0;i<F.length;i++){ const f=F[i]; if(f>=3 && f<=20 && P[i]>pVal){ pVal=P[i]; pIdx=i; } }
-  const fPeak = F[pIdx]||0;
-  // FWHM
-  const half=pVal/2; let L=pIdx,R=pIdx; while(L>0 && P[L]>half) L--; while(R<P.length-1 && P[R]>half) R++; const fwhm = (F[R]-F[L])||0;
-  // razão pico/total na banda 3–20
-  const idxLo = F.findIndex(f=>f>=3); const idxHi = F.findIndex(f=>f>20); const band = P.slice(idxLo, idxHi>0?idxHi:P.length); const sumBand = band.reduce((a,b)=>a+b,0); const ptr = pVal/(sumBand||1);
-  // entropia espectral (normalizada)
-  const pnorm = band.map(v=>v/(sumBand||1)); const eps=1e-12; let se=0; for(const v of pnorm){ const vv=Math.max(v,eps); se += -vv*Math.log(vv); }
-  se = se/Math.log(pnorm.length||2);
-  // centróide espectral
-  let num=0,den=0; for(let i=idxLo;i<(idxHi>0?idxHi:P.length);i++){ num += F[i]*P[i]; den+=P[i]; } const sc = den? num/den : 0;
-  // índice de estabilidade (TSI ~ sd da freq. de pico ao longo de janelas)
-  const tsi = computeTSI(xbp, fs);
-
-  S.results = {F,P,fPeak,fwhm,ptr,se,sc,fs,tsi};
-  renderPlots();
-  classify();
-  document.getElementById('btnExportCsv').disabled=false;
-  document.getElementById('btnExportJson').disabled=false;
-}
-
-function computeTSI(x, fs){
-  const win = Math.round(4*fs); const step = Math.round(win*0.5);
-  const peaks=[]; const h= hann(win); const N=nextPow2(win);
-  for(let off=0; off+win<=x.length; off+=step){
-    const seg=x.slice(off,off+win); const re=new Float64Array(N), im=new Float64Array(N);
-    for(let n=0;n<win;n++){ re[n]=seg[n]*h[n]; }
-    fftRadix2(re,im);
-    const half=N>>1; let bestK=0,best=0; for(let k=0;k<half;k++){ const f=k*fs/N; if(f>=3 && f<=20){ const p=re[k]*re[k]+im[k]*im[k]; if(p>best){best=p;bestK=k;} }}
-    peaks.push(bestK*fs/N);
+  
+  // Draw signal
+  ctx.strokeStyle = '#007AFF';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  
+  for (let i = 0; i < times.length; i++) {
+    const x = padding + (times[i] - minT) / (maxT - minT) * width;
+    const y = padding + (1 - (signal[i] - minS) / rangeS) * height;
+    
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
   }
-  if(peaks.length<2) return 0;
-  const m = peaks.reduce((a,b)=>a+b,0)/peaks.length;
-  const sd = Math.sqrt(peaks.reduce((a,b)=>a+(b-m)*(b-m),0)/ (peaks.length-1));
-  return sd/(m||1);
-}
-
-function biquadBandpass(x, fs, f1, f2){
-  // Butterworth 2ª ordem via bilinear (aprox. em cascata: HP f1 e LP f2)
-  let y = biquad(x, fs, 'hp', f1);
-  y = biquad(y, fs, 'lp', f2);
-  return y;
-}
-
-function biquad(x, fs, type, fc){
-  const w0 = 2*Math.PI*fc/fs; const cos=Math.cos(w0), sin=Math.sin(w0); const Q=Math.SQRT1_2; // butter aprox
-  let b0,b1,b2,a0,a1,a2;
-  if(type==='lp'){
-    const alpha = sin/(2*Q);
-    b0=(1-cos)/2; b1=1-cos; b2=(1-cos)/2; a0=1+alpha; a1=-2*cos; a2=1-alpha;
-  }else{ // hp
-    const alpha = sin/(2*Q);
-    b0=(1+cos)/2; b1=-(1+cos); b2=(1+cos)/2; a0=1+alpha; a1=-2*cos; a2=1-alpha;
-  }
-  b0/=a0; b1/=a0; b2/=a0; a1/=a0; a2/=a0;
-  const y=new Float64Array(x.length); let x1=0,x2=0,y1=0,y2=0;
-  for(let n=0;n<x.length;n++){
-    const out = b0*x[n] + b1*x1 + b2*x2 - a1*y1 - a2*y2;
-    y[n]=out; x2=x1; x1=x[n]; y2=y1; y1=out;
-  }
-  return Array.from(y);
-}
-
-/**********************\
- *  PLOTs              *
-\**********************/
-function plotLine(canvasId, X, Y, options={}){
-  const c = document.getElementById(canvasId); const ctx = c.getContext('2d');
-  const rect = c.getBoundingClientRect(); c.width=rect.width*devicePixelRatio; c.height=rect.height*devicePixelRatio; ctx.scale(devicePixelRatio,devicePixelRatio);
-  ctx.clearRect(0,0,rect.width,rect.height);
-  const pad=24; const W=rect.width-2*pad, H=rect.height-2*pad;
-  const minX = options.minX ?? Math.min(...X), maxX = options.maxX ?? Math.max(...X);
-  const minY = options.minY ?? Math.min(...Y), maxY = options.maxY ?? Math.max(...Y);
-  const rangeY = (maxY-minY)||1;
-  // grid
-  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
-  for(let i=0;i<=5;i++){ const y=pad + i*H/5; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(rect.width-pad,y); ctx.stroke(); }
-  // line
-  ctx.strokeStyle= options.color || '#7ab7ff'; ctx.lineWidth=2; ctx.beginPath();
-  for(let i=0;i<X.length;i++){
-    const x = pad + (X[i]-minX)/(maxX-minX)*W;
-    const y = pad + (1-(Y[i]-minY)/rangeY)*H;
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  }
+  
   ctx.stroke();
-  // labels
-  ctx.fillStyle='rgba(255,255,255,.6)'; ctx.font='12px system-ui';
-  if(options.label) ctx.fillText(options.label, pad, pad-6);
-  if(options.xLabel) ctx.fillText(options.xLabel, rect.width-80, rect.height-8);
-  if(options.yLabel){ ctx.save(); ctx.translate(8, pad+12); ctx.rotate(-Math.PI/2); ctx.fillText(options.yLabel, 0, 0); ctx.restore(); }
-  // marker opcional
-  if(options.markerX!=null){
-    const mx = pad + (options.markerX-minX)/(maxX-minX)*W;
-    ctx.strokeStyle='#FF3B30'; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(mx,pad); ctx.lineTo(mx,pad+H); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle='#FF3B30'; ctx.fillText((options.markerX).toFixed(1)+' Hz', mx+6, pad+14);
+  
+  // Add label
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.font = '12px system-ui';
+  ctx.fillText('Sinal Temporal', padding, padding - 5);
+}
+
+// Plot frequency spectrum
+function plotSpectrum(freqs, spectrum, peakFreq) {
+  const canvas = document.getElementById('chartPSD');
+  const ctx = canvas.getContext('2d');
+  
+  // Set canvas size for retina displays
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * window.devicePixelRatio;
+  canvas.height = rect.height * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  
+  // Clear canvas
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  
+  // Calculate bounds (limit to 0-30 Hz)
+  const padding = 20;
+  const width = rect.width - 2 * padding;
+  const height = rect.height - 2 * padding;
+  
+  const maxFreq = Math.min(30, Math.max(...freqs));
+  const maxSpec = Math.max(...spectrum);
+  
+  // Draw grid
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + i * height / 5;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(rect.width - padding, y);
+    ctx.stroke();
+  }
+  
+  // Draw spectrum
+  ctx.strokeStyle = '#34C759';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  
+  for (let i = 0; i < freqs.length && freqs[i] <= maxFreq; i++) {
+    const x = padding + freqs[i] / maxFreq * width;
+    const y = padding + (1 - spectrum[i] / maxSpec) * height;
+    
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  
+  ctx.stroke();
+  
+  // Mark peak
+  const peakIdx = freqs.findIndex(f => f >= peakFreq);
+  if (peakIdx >= 0) {
+    const x = padding + peakFreq / maxFreq * width;
+    const y = padding + (1 - spectrum[peakIdx] / maxSpec) * height;
+    
+    ctx.fillStyle = '#FF3B30';
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    ctx.fill();
+    
+    // Add peak label
+    ctx.fillStyle = '#FF3B30';
+    ctx.font = '11px system-ui';
+    ctx.fillText(`${peakFreq.toFixed(1)} Hz`, x + 8, y + 3);
+  }
+  
+  // Add label
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.font = '12px system-ui';
+  ctx.fillText('Espectro de Frequência', padding, padding - 5);
+}
+
+// Classify tremor type based on frequency characteristics
+function classifyTremor() {
+  if (!state.results) return;
+  
+  const { peakFreq, prominence, width } = state.results;
+  
+  // Show classification section
+  document.getElementById('classificationSection').classList.remove('hidden');
+  
+  // Simple heuristic classification
+  let scores = {
+    OT: 0,  // Orthostatic
+    ET: 0,  // Essential
+    DT: 0,  // Dystonic
+    MY: 0   // Myoclonus
+  };
+  
+  // Orthostatic tremor: 13-18 Hz, high prominence
+  if (peakFreq >= 13 && peakFreq <= 18) {
+    scores.OT = prominence > 5 ? 0.9 : 0.6;
+  }
+  
+  // Essential tremor: 4-12 Hz
+  if (peakFreq >= 4 && peakFreq <= 12) {
+    scores.ET = 0.8 - Math.abs(peakFreq - 7) * 0.1;
+  }
+  
+  // Dystonic tremor: 4-7 Hz, broader spectrum
+  if (peakFreq >= 4 && peakFreq <= 7 && width > 1.5) {
+    scores.DT = 0.7;
+  }
+  
+  // Myoclonus: irregular, broad spectrum
+  if (width > 3 && prominence < 3) {
+    scores.MY = 0.6;
+  }
+  
+  // Normalize scores to percentages
+  const total = Math.max(0.001, scores.OT + scores.ET + scores.DT + scores.MY);
+  
+  // Update UI with animation
+  setTimeout(() => {
+    animateClassification('OT', scores.OT / total * 100);
+    animateClassification('ET', scores.ET / total * 100);
+    animateClassification('DT', scores.DT / total * 100);
+    animateClassification('MY', scores.MY / total * 100);
+  }, 100);
+}
+
+// Animate classification bars
+function animateClassification(type, percentage) {
+  const bar = document.getElementById(`bar${type}`);
+  const pct = document.getElementById(`pct${type}`);
+  
+  bar.style.width = `${percentage}%`;
+  pct.textContent = `${Math.round(percentage)}%`;
+  
+  // Color based on confidence
+  if (percentage > 60) {
+    bar.style.background = 'var(--success)';
+  } else if (percentage > 30) {
+    bar.style.background = 'var(--warning)';
+  } else {
+    bar.style.background = 'var(--primary)';
   }
 }
 
-function renderPlots(){
-  // tempo
-  const T = S.times; const X = S.data; const fs=S.fsEst||60;
-  // mostrar 10 s finais se muito longo
-  const showSec = Math.min(10, (T[T.length-1]||10));
-  const idx0 = T.findIndex(t=>t >= (T[T.length-1]-showSec));
-  plotLine('cTime', T.slice(idx0), X.slice(idx0), {label:'Sinal temporal', xLabel:'tempo (s)', yLabel:'g ~', minY: Math.min(-5, Math.min(...X.slice(idx0))), maxY: Math.max(5, Math.max(...X.slice(idx0)))});
-
-  // PSD
-  const {F,P,fPeak,fwhm,ptr,se,sc} = S.results;
-  plotLine('cPSD', F, P, {label:'PSD (Welch)', xLabel:'frequência (Hz)', yLabel:'g^2/Hz', minX:0, maxX:30, color:'#34C759', markerX:fPeak});
-
-  // métricas
-  byId('mPeak').textContent = fPeak? fPeak.toFixed(1)+' Hz':'—';
-  byId('mFwhm').textContent = fwhm.toFixed(2)+' Hz';
-  byId('mPtr').textContent = ptr.toFixed(2);
-  byId('mSE').textContent = se.toFixed(2);
-  byId('mSC').textContent = sc.toFixed(1)+' Hz';
-  byId('mTSI').textContent = S.results.tsi.toFixed(2);
-
-  byId('cardPlots').style.display='block';
-}
-
-/**********************\
- *  CLASSIFICAÇÃO      *
-\**********************/
-function classify(){
-  const {fPeak,fwhm,ptr,se,tsi} = S.results;
-  const post = S.posture;
-  const scores = {OT:0, ET:0, PD:0, DT:0, MY:0};
-  // Regras simples e transparentes (ajustáveis):
-  // OT: 13–18 Hz, pico estreito (fwhm<2), postura em pé
-  if(fPeak>=13 && fPeak<=18){ scores.OT += 0.6; if(fwhm<2) scores.OT+=0.2; if(post==='standing') scores.OT+=0.2; }
-  // ET: 4–12 Hz, pico pronunciado (ptr>0.25), fwhm moderado (<3), postura postural/ação
-  if(fPeak>=4 && fPeak<=12){ scores.ET += 0.5; if(ptr>0.25) scores.ET+=0.2; if(fwhm<3) scores.ET+=0.1; if(post!=='rest') scores.ET+=0.1; }
-  // PD repouso: 3–6 Hz, pico razoável, postura repouso
-  if(fPeak>=3 && fPeak<=6){ scores.PD += 0.5; if(post==='rest') scores.PD+=0.2; if(ptr>0.2) scores.PD+=0.1; }
-  // Distônico: 3–7 Hz, banda mais larga (fwhm>2.0), entropia > 0.6
-  if(fPeak>=3 && fPeak<=7 && fwhm>2.0 && se>0.6){ scores.DT += 0.6; }
-  // Mioclonia: espectro amplo (se>0.7), pico pouco proeminente (ptr<0.18), alta instabilidade (tsi>0.15)
-  if(se>0.7 && ptr<0.18){ scores.MY += 0.5; if(tsi>0.15) scores.MY+=0.2; }
-
-  // Normalizar
-  const total = Object.values(scores).reduce((a,b)=>a+b,0) || 1;
-  const pct = Object.fromEntries(Object.entries(scores).map(([k,v])=>[k, 100*v/total]));
-  // UI
-  setBar('OT', pct.OT); setBar('ET', pct.ET); setBar('PD', pct.PD); setBar('DT', pct.DT); setBar('MY', pct.MY);
-  byId('cardClass').style.display='block';
-
-  // explicação curta
-  const top = Object.entries(pct).sort((a,b)=>b[1]-a[1])[0][0];
-  const explain = {
-    OT: 'Pico entre 13–18 Hz com banda estreita, compatível com tremor ortostático.',
-    ET: 'Pico bem definido em 4–12 Hz, compatível com tremor essencial.',
-    PD: 'Pico em 3–6 Hz em repouso, compatível com tremor parkinsoniano de repouso.',
-    DT: 'Banda ampla 3–7 Hz com maior irregularidade, compatível com tremor distônico.',
-    MY: 'Distribuição espectral difusa/irregular, compatível com mioclonia cortical/negativa.'
-  }[top];
-  byId('explain').textContent = explain + ' (resultado heurístico; interpretar no contexto clínico).';
-}
-
-function setBar(key, v){
-  const pct = Math.round(v); const fill = byId('bar'+key); const txt = byId('pct'+key);
-  fill.style.width = pct+'%'; txt.textContent = pct+'%';
-  fill.style.background = pct>60? 'var(--success)': (pct>30? 'var(--warning)': 'var(--primary)');
-}
-
-/**********************\
- *  EXPORTAÇÃO         *
-\**********************/
-function exportCSV(){
-  if(!S.times.length) return; let csv='time_s,accel_g\n';
-  for(let i=0;i<S.times.length;i++) csv+= S.times[i].toFixed(6)+','+ S.data[i].toFixed(6)+'\n';
-  download(csv, 'text/csv', `tremor_${dateStamp()}.csv`);
-}
-function exportJSON(){
-  const payload = { meta:{fs_est: S.fsEst, posture:S.posture, axis:S.axis, duration:S.duration, welch:S.welchWin, overlap:S.overlap},
-    raw:{t:S.times, x:S.data}, metrics:S.results };
-  download(JSON.stringify(payload,null,2), 'application/json', `tremor_${dateStamp()}.json`);
-}
-function download(data, mime, name){
-  const blob = new Blob([data], {type:mime}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function dateStamp(){ return new Date().toISOString().replace(/[:T]/g,'-').slice(0,19); }
-
-/**********************\
- *  UTIL & UI          *
-\**********************/
-function byId(id){ return document.getElementById(id); }
-function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-
-function updateTaskHint(){
-  const m = {
-    rest:'Repouso: apoiar antebraços, mãos relaxadas. Evitar conversa/movimentos.',
-    posture:'Postural: braços estendidos à frente, mãos em pronação.',
-    action:'Cinético: executar dedo–nariz–dedo continuamente.',
-    standing:'Ortostatismo: em pé, pés afastados, braços ao lado do corpo.'
-  }[S.posture];
-  byId('hintTask').textContent = 'Orientação: '+m;
-}
-
-// mudar mensagem ao trocar postura
-byId('selPosture').addEventListener('change', e=>{ S.posture=e.target.value; updateTaskHint(); });
-
-/**********************\
- *  SERVICE WORKER     *
-\**********************/
-if('serviceWorker' in navigator){
-  const swCode = `self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>new Response('Offline',{status:503,statusText:'Offline'})))})`;
-  const blob = new Blob([swCode], {type:'text/javascript'});
+// Export data as CSV
+function exportData() {
+  if (!state.data || state.data.length === 0) return;
+  
+  let csv = 'Time (s),Acceleration\n';
+  state.data.forEach(row => {
+    csv += `${row[0].toFixed(6)},${row[1].toFixed(6)}\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(url).catch(()=>{});
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tremor_analysis_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  // Vibrate for feedback
+  if ('vibrate' in navigator) {
+    navigator.vibrate(50);
+  }
 }
 
-/**********************\
- *  HOOKS DE UI        *
-\**********************/
-byId('btnEnable').addEventListener('click', enableSensors);
-byId('btnStart').addEventListener('click', ()=>{ S.collecting? stopCollection(): startCollection(); });
-byId('btnExportCsv').addEventListener('click', exportCSV);
-byId('btnExportJson').addEventListener('click', exportJSON);
-byId('btnReset').addEventListener('click', ()=>{ S.data=[]; S.times=[]; S.results=null; byId('cardPlots').style.display='none'; byId('cardClass').style.display='none'; });
+// Reset app for new analysis
+function resetApp() {
+  // Reset state
+  state.data = [];
+  state.results = null;
+  state.collecting = false;
+  
+  // Reset UI
+  document.getElementById('resultsSection').classList.add('hidden');
+  document.getElementById('classificationSection').classList.add('hidden');
+  document.getElementById('footerActions').classList.add('hidden');
+  document.getElementById('statusCard').classList.remove('collecting', 'ready', 'error');
+  document.getElementById('statusCard').classList.add('ready');
+  document.getElementById('statusText').textContent = 'Pronto para nova análise';
+  document.getElementById('statusDetail').textContent = `Taxa: ${state.sampleRate.toFixed(0)} Hz`;
+  document.getElementById('actionBtn').disabled = false;
+  document.getElementById('actionBtn').classList.remove('success', 'collecting');
+  document.getElementById('actionText').textContent = 'Iniciar Coleta';
+  document.getElementById('progressBar').style.width = '0%';
+  
+  // Reset classification bars
+  ['OT', 'ET', 'DT', 'MY'].forEach(type => {
+    document.getElementById(`bar${type}`).style.width = '0%';
+    document.getElementById(`pct${type}`).textContent = '0%';
+  });
+  
+  // Vibrate for feedback
+  if ('vibrate' in navigator) {
+    navigator.vibrate(50);
+  }
+}
 
-// Atualizações periódicas de qualidade enquanto não coleta
-setInterval(()=>{ if(!S.collecting && S.eventCount>0){ updateQuality(); byId('cardQual').style.display='block'; } }, 600);
+// Auto-initialize on load
+window.addEventListener('load', () => {
+  // Check if already onboarded (for return visits)
+  if (localStorage.getItem('tremor_onboarded')) {
+    document.getElementById('onboarding').classList.add('hidden');
+    state.onboarded = true;
+    requestSensorPermission().then(() => {
+      initializeApp();
+    });
+  }
+});
+
+// Save onboarding state
+window.addEventListener('beforeunload', () => {
+  if (state.onboarded) {
+    localStorage.setItem('tremor_onboarded', 'true');
+  }
+});
+
+// Handle orientation changes
+window.addEventListener('orientationchange', () => {
+  // Redraw canvases
+  if (state.results) {
+    setTimeout(() => {
+      displayResults();
+    }, 100);
+  }
+});
+
+// Progressive Web App capabilities
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {
+    // Service worker registration failed, app still works
+  });
+}
 </script>
+
+<!-- Optional PWA Service Worker -->
+<script id="sw.js">
+// Basic service worker for offline capability
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(fetch(event.request).catch(() => {
+    return new Response('Offline');
+  }));
+});
+</script>
+
 </body>
 </html>
